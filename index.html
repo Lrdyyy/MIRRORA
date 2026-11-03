@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+  MIRRORA PHILIPPINES: collections website.
+  Three files work together:
+    index.html = structure (this file)
+    style.css  = looks (colors, fonts, layout). The palette lives at the top of it.
+    script.js  = behavior + the product list. To add or edit a mirror, edit script.js.
+  Keep all three files AND the "images" folder together, then double-click index.html.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mirrora Philippines | Mirrors made to fit your space</title>
+  <meta name="description" content="Round, capsule, arch and grid mirrors with LED, wood, rattan and aluminum frames.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700&family=Montserrat:wght@400;500;600&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="top">
+    <div class="wrap bar">
+      <a href="#top" aria-label="Mirrora Philippines, home"><img class="logo" src="images/logo.jpg" alt="Mirrora Philippines"></a>
+      <nav>
+        <a class="navlink" href="#collections">Collections</a>
+        <a class="btn" href="#contact">Contact us now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO: headline on the left, an arch-shaped photo on the right -->
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Mirrora Philippines</p>
+        <h1>Mirrors made to fit your space.</h1>
+        <p class="lede">Round, capsule, arch and grid mirrors in wood, rattan, aluminum and LED-lit frames. Many designs come in custom colors and finishes.</p>
+        <div class="actions">
+          <a class="btn" href="#collections">View collections</a>
+          <a class="btn outline" href="#contact">Contact us now</a>
+        </div>
+      </div>
+      <img class="arch" src="images/tita.jpg" alt="Backlit mirror above a bathroom vanity">
+    </section>
+
+    <!-- COLLECTIONS: the filter chips and cards are built by script.js -->
+    <section id="collections" class="block">
+      <div class="wrap">
+        <h2>The collections</h2>
+        <p class="lede">Choose a shape, then open a mirror to see sizes and prices.</p>
+        <div class="chips" id="chips" role="group" aria-label="Filter by shape"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <section class="block sand">
+      <div class="wrap points">
+        <div><h3>Custom colors</h3><p>Colors and finishes can be customized on many designs.</p></div>
+        <div><h3>LED options</h3><p>Tri-color lights, single touch switch, ready to plug and play.</p></div>
+        <div><h3>Ready to hang</h3><p>Back hooks included upon request.</p></div>
+      </div>
+    </section>
+
+    <!-- CONTACT: the buttons get their links from script.js (CONTACT settings) -->
+    <section id="contact" class="block">
+      <div class="wrap contact">
+        <h2>Contact us now</h2>
+        <p class="lede">Tell us the mirror, size and color you want, and we will reply with the details.</p>
+        <div class="actions center">
+          <a class="btn" id="msgBtn" href="#">Message us on Messenger</a>
+          <a class="btn outline" id="mailBtn" href="#">Email us</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <img src="images/logo-light.jpg" alt="Mirrora Philippines" class="footlogo">
+      <small>© 2026 Mirrora Philippines</small>
+    </div>
+  </footer>
+
+  <!-- The pop-up. <dialog> is built into the browser: it handles Esc and the dark backdrop for us. -->
+  <dialog id="modal" aria-labelledby="mTitle">
+    <button class="close" id="mClose" aria-label="Close">×</button>
+    <div id="mBody"></div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
