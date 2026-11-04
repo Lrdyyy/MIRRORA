@@ -8,7 +8,7 @@
 /* ---------- PART 1: CONTACT DETAILS ----------
    CHANGE THESE two values to your real ones. */
 const CONTACT = {
-  messenger: "https://m.me/YOUR-PAGE-NAME",   // your Facebook page's Messenger link
+  messenger: "https://m.me/217532241448780",   // your Facebook page's Messenger link
   email: "hello@yourdomain.com"
 };
 
