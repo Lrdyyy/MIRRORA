@@ -8,8 +8,8 @@
 /* ---------- PART 1: CONTACT DETAILS ----------
    CHANGE THESE two values to your real ones. */
 const CONTACT = {
-  messenger: "https://m.me/217532241448780",   // your Facebook page's Messenger link
-  email: "mirrora.ph@gmail.com"
+  messenger: "https://m.me/YOUR-PAGE-NAME",   // your Facebook page's Messenger link
+  email: "hello@yourdomain.com"
 };
 
 /* ---------- PART 2: PRODUCTS ----------
@@ -322,9 +322,18 @@ modal.addEventListener("click", e => { if (e.target === modal) modal.close(); })
 
 // Connect the Contact section buttons to the CONTACT settings
 document.getElementById("msgBtn").href = CONTACT.messenger;
-/* Every button marked data-messenger (the "Contact us now" buttons) opens Messenger. */
-document.querySelectorAll("[data-messenger]").forEach(a => { a.href = CONTACT.messenger; });
 document.getElementById("mailBtn").href = "mailto:" + CONTACT.email;
+
+// The "Contact us now" buttons open a small box where the visitor picks Messenger or Email
+const contactModal = document.getElementById("contactModal");
+document.getElementById("cMsg").href = CONTACT.messenger;
+document.getElementById("cMail").href = "mailto:" + CONTACT.email;
+document.querySelectorAll("[data-contact]").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault();          // don't scroll down the page; show the choice box instead
+  contactModal.showModal();
+}));
+document.getElementById("cClose").addEventListener("click", () => contactModal.close());
+contactModal.addEventListener("click", e => { if (e.target === contactModal) contactModal.close(); });
 
 // Go!
 drawChips();

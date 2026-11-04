@@ -24,7 +24,7 @@
       <a href="#top" aria-label="Mirrora Philippines, home"><img class="logo" src="images/logo.jpg" alt="Mirrora Philippines"></a>
       <nav>
         <a class="navlink" href="#collections">Collections</a>
-        <a class="btn" data-messenger href="#contact" target="_blank" rel="noopener">Contact us now</a>
+        <a class="btn" data-contact href="#contact">Contact us now</a>
       </nav>
     </div>
   </header>
@@ -38,7 +38,7 @@
         <p class="lede">Round, capsule, arch and grid mirrors in wood, rattan, aluminum and LED-lit frames. Many designs come in custom colors and finishes.</p>
         <div class="actions">
           <a class="btn" href="#collections">View collections</a>
-          <a class="btn outline" data-messenger href="#contact" target="_blank" rel="noopener">Contact us now</a>
+          <a class="btn outline" data-contact href="#contact">Contact us now</a>
         </div>
       </div>
       <img class="arch" src="images/tita.jpg" alt="Backlit mirror above a bathroom vanity">
@@ -83,6 +83,16 @@
   </footer>
 
   <!-- The pop-up. <dialog> is built into the browser: it handles Esc and the dark backdrop for us. -->
+  <!-- "Contact us now" choice box: Messenger or Email. script.js fills in the links. -->
+  <dialog id="contactModal" aria-labelledby="cTitle" class="small">
+    <button class="close" id="cClose" aria-label="Close">×</button>
+    <div class="choose">
+      <h2 id="cTitle">How would you like to reach us?</h2>
+      <a class="btn" id="cMsg" href="#" target="_blank" rel="noopener">Message us on Messenger</a>
+      <a class="btn outline" id="cMail" href="#">Email us</a>
+    </div>
+  </dialog>
+
   <dialog id="modal" aria-labelledby="mTitle">
     <button class="close" id="mClose" aria-label="Close">×</button>
     <div id="mBody"></div>
