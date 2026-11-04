@@ -9,7 +9,7 @@
    CHANGE THESE two values to your real ones. */
 const CONTACT = {
   messenger: "https://m.me/217532241448780",   // your Facebook page's Messenger link
-  email: "hello@yourdomain.com"
+  email: "mirrora.ph@gmail.com"
 };
 
 /* ---------- PART 2: PRODUCTS ----------
