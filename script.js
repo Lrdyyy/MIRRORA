@@ -324,16 +324,27 @@ modal.addEventListener("click", e => { if (e.target === modal) modal.close(); })
 document.getElementById("msgBtn").href = CONTACT.messenger;
 document.getElementById("mailBtn").href = "mailto:" + CONTACT.email;
 
-// The "Contact us now" buttons open a small box where the visitor picks Messenger or Email
-const contactModal = document.getElementById("contactModal");
-document.getElementById("cMsg").href = CONTACT.messenger;
-document.getElementById("cMail").href = "mailto:" + CONTACT.email;
-document.querySelectorAll("[data-contact]").forEach(a => a.addEventListener("click", e => {
-  e.preventDefault();          // don't scroll down the page; show the choice box instead
-  contactModal.showModal();
+// The "Contact us now" buttons open a small bubble right under them with two choices
+function closeBubbles() {
+  document.querySelectorAll(".bubble").forEach(b => b.remove());
+  document.querySelectorAll("[data-contact]").forEach(a => a.setAttribute("aria-expanded", "false"));
+}
+document.querySelectorAll("[data-contact]").forEach(btn => btn.addEventListener("click", e => {
+  e.preventDefault();                      // don't scroll down the page
+  const wasOpen = btn.getAttribute("aria-expanded") === "true";
+  closeBubbles();                          // only one bubble at a time
+  if (wasOpen) return;                     // clicking again closes it
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.innerHTML = `
+    <a class="btn" href="${CONTACT.messenger}" target="_blank" rel="noopener">Message us on Messenger</a>
+    <a class="btn outline" href="mailto:${CONTACT.email}">Email us</a>`;
+  btn.parentElement.appendChild(bubble);
+  btn.setAttribute("aria-expanded", "true");
 }));
-document.getElementById("cClose").addEventListener("click", () => contactModal.close());
-contactModal.addEventListener("click", e => { if (e.target === contactModal) contactModal.close(); });
+// Click anywhere else, or press Esc, to close the bubble
+document.addEventListener("click", e => { if (!e.target.closest(".pop")) closeBubbles(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeBubbles(); });
 
 // Go!
 drawChips();
