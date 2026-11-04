@@ -322,6 +322,8 @@ modal.addEventListener("click", e => { if (e.target === modal) modal.close(); })
 
 // Connect the Contact section buttons to the CONTACT settings
 document.getElementById("msgBtn").href = CONTACT.messenger;
+/* Every button marked data-messenger (the "Contact us now" buttons) opens Messenger. */
+document.querySelectorAll("[data-messenger]").forEach(a => { a.href = CONTACT.messenger; });
 document.getElementById("mailBtn").href = "mailto:" + CONTACT.email;
 
 // Go!
