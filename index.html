@@ -89,7 +89,19 @@ h3 { font-size: 1.2rem; font-weight: 600; }
 .card { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
 .card .photo, .card .ph { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 6px; background: var(--sand); }
 .card .ph { display: grid; place-items: center; color: var(--muted); font-size: .9rem; border: 1.5px dashed var(--tan); }
-.card:hover .photo { filter: brightness(.94); }
+.card { display: block; }
+/* HOVER FLOAT: the photo lifts, tilts toward the mouse, and a soft light follows the pointer.
+   The script sets --rx / --ry (tilt) and --mx / --my (where the light sits) as the mouse moves. */
+.pwrap { position: relative; display: block; border-radius: 6px; overflow: hidden;
+  transform: perspective(900px) translateY(var(--lift, 0)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .35s ease, box-shadow .35s ease; will-change: transform; }
+.pwrap::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.35), transparent 55%); }
+.card:hover .pwrap, .card:focus-visible .pwrap { --lift: -8px; box-shadow: 0 22px 34px -16px rgba(43,36,28,.45); }
+.card:hover .pwrap::after { opacity: 1; }
+.card .pwrap .photo, .card .pwrap .ph { border-radius: 0; }
+.card:hover h3 { color: var(--tan-dark); }
+@media (prefers-reduced-motion: reduce) { .pwrap { transition: none; --rx: 0deg !important; --ry: 0deg !important; } }
 .tag { font-family: var(--font-label); margin: 14px 0 2px; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--tan-dark); font-weight: 600; }
 .card h3 { margin-bottom: 4px; }
 .price { margin: 0; color: var(--muted); font-size: .92rem; }
@@ -110,6 +122,31 @@ table { width: 100%; border-collapse: collapse; font-size: .95rem; margin-bottom
 td { padding: 9px 4px; border-bottom: 1px solid var(--line); }
 td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
 .m-info ul { margin: 0 0 22px; padding-left: 18px; color: var(--muted); }
+
+/* ---- Height comparison ---- */
+.cmp-toggle { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 10px 18px; border-radius: 999px;
+  border: 1.5px solid var(--tan); background: transparent; color: var(--tan-dark); cursor: pointer;
+  font: 600 .75rem var(--font-label); letter-spacing: .14em; text-transform: uppercase; }
+.cmp-toggle:hover, .cmp-toggle[aria-expanded="true"] { background: var(--tan); color: var(--ink); }
+.cmp { border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin-bottom: 22px; background: #fff; }
+.cmp-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; align-items: start; }
+.cmp label, .cmp .lbl { display: block; font: 600 .7rem var(--font-label); letter-spacing: .14em; text-transform: uppercase; color: var(--tan-dark); margin: 0 0 6px; }
+.field { margin-bottom: 14px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cmp input { width: 84px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: var(--paper); color: var(--ink); }
+.cmp input:focus { outline: 2px solid var(--tan); border-color: var(--tan); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: none; padding: 7px 14px; cursor: pointer; font: 600 .72rem var(--font-label); letter-spacing: .1em; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.sizepick { display: flex; flex-wrap: wrap; gap: 6px; }
+.sizepick button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 6px 12px; cursor: pointer;
+  font: 500 .78rem var(--font-label); color: var(--ink); }
+.sizepick button[aria-pressed="true"] { border-color: var(--tan-dark); background: var(--sand); }
+.cmp-svg { width: 100%; height: auto; display: block; background: var(--paper); border-radius: 8px; }
+.verdict { margin: 4px 0 0; font-size: .95rem; color: var(--ink); }
+.verdict b { color: var(--tan-dark); }
+.hint { font-size: .82rem; color: var(--muted); margin: 6px 0 0; }
+@media (max-width: 760px) { .cmp-grid { grid-template-columns: 1fr; } }
 
 /* ---- Footer ---- */
 footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
@@ -475,12 +512,36 @@ function drawGrid() {
     const card = document.createElement("button");
     card.className = "card";
     const from = p.soon ? "Ask us for details" : "From " + php(Math.min(...p.sizes.map(s => s[2])));
-    const photo = p.images.length
+    const photo = `<span class="pwrap">${p.images.length
       ? `<img class="photo" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-      : `<div class="ph">Photos coming soon</div>`;
+      : `<span class="ph">Photos coming soon</span>`}</span>`;
     card.innerHTML = `${photo}<p class="tag">${p.cat}</p><h3>${p.name}</h3><p class="price">${from}</p>`;
     card.addEventListener("click", () => openModal(p));
+    addTilt(card);
     grid.appendChild(card);
+  });
+}
+
+// 2b) HOVER FLOAT: tilt the photo toward the mouse.
+// We measure where the pointer is inside the photo (0 to 1 across, 0 to 1 down)
+// and turn that into a small tilt (max 6 degrees) plus the spot for the soft light.
+const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function addTilt(card) {
+  if (!canHover) return;                 // phones: no mouse, so skip it
+  const wrap = card.querySelector(".pwrap");
+  card.addEventListener("pointermove", e => {
+    const r = wrap.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;    // 0 = left edge, 1 = right edge
+    const y = (e.clientY - r.top) / r.height;    // 0 = top, 1 = bottom
+    wrap.style.setProperty("--mx", (x * 100) + "%");
+    wrap.style.setProperty("--my", (y * 100) + "%");
+    if (calm) return;
+    wrap.style.setProperty("--ry", ((x - .5) * 12) + "deg");
+    wrap.style.setProperty("--rx", ((.5 - y) * 12) + "deg");
+  });
+  card.addEventListener("pointerleave", () => {
+    ["--rx", "--ry"].forEach(v => wrap.style.setProperty(v, "0deg"));
   });
 }
 
@@ -500,7 +561,12 @@ function openModal(p) {
   mBody.innerHTML = `${img}${thumbs}
     <div class="m-info">
       <p class="tag">${p.cat}</p><h2 id="mTitle">${p.name}</h2><p class="use">${p.use}</p>
-      ${table}${notes}
+      ${table}
+      ${p.sizes.length ? `<button class="cmp-toggle" id="cmpBtn" aria-expanded="false" aria-controls="cmpBox">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V3m0 0 3 3M4 3 1 6M10 21h11M14 7h7v14"/></svg>
+        Compare with my height</button>
+      <div class="cmp" id="cmpBox" hidden></div>` : ""}
+      ${notes}
       <div class="actions">
         <a class="btn" href="${CONTACT.messenger}" target="_blank" rel="noopener">Inquire on Messenger</a>
         <a class="btn outline" href="${mail}">Email us</a>
@@ -513,7 +579,177 @@ function openModal(p) {
     mBody.querySelectorAll(".thumbs button").forEach(b => b.setAttribute("aria-current", b === btn));
   }));
 
+  // "Compare with my height" opens and closes the comparison panel
+  const cmpBtn = document.getElementById("cmpBtn");
+  if (cmpBtn) cmpBtn.addEventListener("click", () => {
+    const box = document.getElementById("cmpBox");
+    const open = box.hidden;
+    box.hidden = !open;
+    cmpBtn.setAttribute("aria-expanded", open);
+    if (open) buildCompare(p, box);
+  });
+
   modal.showModal();   // built-in: shows the pop-up, and Esc closes it
+}
+
+/* ============================================================
+   4) HEIGHT COMPARISON
+   Turns a size like "24 × 60 in" or "80 cm diameter" into centimeters,
+   then draws the customer and the mirror side by side, to scale.
+   We read sizes as WIDTH × HEIGHT, the way they are written in the product list.
+   ============================================================ */
+const IN = 2.54;   // 1 inch = 2.54 cm
+
+// "24 × 60 in" -> {w: 61, h: 152}   "80 cm diameter" -> {w: 80, h: 80, round: true}
+function parseSize(text) {
+  const t = text.toLowerCase();
+  const toCm = t.includes("in") && !t.includes("cm") ? IN : 1;
+  const nums = (t.match(/\d+(\.\d+)?/g) || []).map(Number);
+  if (!nums.length) return null;
+  if (t.includes("diameter")) return { w: nums[0] * toCm, h: nums[0] * toCm, round: true };
+  return { w: nums[0] * toCm, h: (nums[1] || nums[0]) * toCm };
+}
+
+// Remember the customer's height while they browse (and next visit, if the browser allows)
+const cmpState = { unit: "cm", height: 165, bottom: null };
+try { const s = JSON.parse(localStorage.getItem("mirroraHeight")); if (s) Object.assign(cmpState, s, { bottom: null }); } catch (e) {}
+function saveCmp() { try { localStorage.setItem("mirroraHeight", JSON.stringify({ unit: cmpState.unit, height: cmpState.height })); } catch (e) {} }
+
+const fmt = cm => cmpState.unit === "cm"
+  ? Math.round(cm) + " cm"
+  : (() => { const i = Math.round(cm / IN); return Math.floor(i / 12) + "′ " + (i % 12) + "″"; })();
+
+function buildCompare(p, box) {
+  const sizes = p.sizes.map(s => ({ label: s[0], text: s[1], ...parseSize(s[1]) })).filter(s => s.w);
+  let pick = 0;
+  const isRound = p.cat === "Round";
+
+  box.innerHTML = `
+    <div class="cmp-grid">
+      <div>
+        <div class="field">
+          <span class="lbl">Units</span>
+          <div class="seg" role="group" aria-label="Units">
+            <button data-u="cm">CM</button><button data-u="ft">FT / IN</button>
+          </div>
+        </div>
+        <div class="field" id="hField"></div>
+        <div class="field">
+          <span class="lbl">Mirror size</span>
+          <div class="sizepick">${sizes.map((s, i) => `<button data-i="${i}">${s.text}</button>`).join("")}</div>
+        </div>
+        <div class="field">
+          <label for="bIn">Bottom edge from floor</label>
+          <div class="row" id="bRow"></div>
+          <p class="hint">Whole body mirrors usually sit near the floor; vanity mirrors hang higher.</p>
+        </div>
+      </div>
+      <div>
+        <svg class="cmp-svg" id="cmpSvg" role="img" aria-label="Your height next to the mirror, to scale"></svg>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+      </div>
+    </div>`;
+
+  const svg = box.querySelector("#cmpSvg");
+
+  // Height input: one box for cm, two boxes for feet + inches
+  function drawInputs() {
+    box.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === cmpState.unit));
+    const hf = box.querySelector("#hField"), br = box.querySelector("#bRow");
+    const s = sizes[pick];
+    if (cmpState.bottom === null) cmpState.bottom = s.h >= 140 ? 5 : 100;   // sensible starting point
+    if (cmpState.unit === "cm") {
+      hf.innerHTML = `<label for="hIn">Your height</label>
+        <div class="row"><input id="hIn" type="number" inputmode="decimal" min="80" max="230" value="${Math.round(cmpState.height)}"> cm</div>`;
+      br.innerHTML = `<input id="bIn" type="number" min="0" max="250" value="${Math.round(cmpState.bottom)}"> cm`;
+    } else {
+      const i = Math.round(cmpState.height / IN);
+      hf.innerHTML = `<label for="hFt">Your height</label>
+        <div class="row"><input id="hFt" type="number" min="2" max="7" value="${Math.floor(i / 12)}" aria-label="Feet"> ft
+        <input id="hInch" type="number" min="0" max="11" value="${i % 12}" aria-label="Inches"> in</div>`;
+      br.innerHTML = `<input id="bIn" type="number" min="0" max="100" value="${Math.round(cmpState.bottom / IN)}"> in`;
+    }
+    // Every time they type, save the number (in cm) and redraw
+    hf.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
+      const v = cmpState.unit === "cm"
+        ? +box.querySelector("#hIn").value
+        : (+box.querySelector("#hFt").value * 12 + +box.querySelector("#hInch").value) * IN;
+      if (v >= 80 && v <= 240) { cmpState.height = v; saveCmp(); draw(); }
+    }));
+    br.querySelector("input").addEventListener("input", e => {
+      const v = +e.target.value * (cmpState.unit === "cm" ? 1 : IN);
+      if (v >= 0 && v <= 260) { cmpState.bottom = v; draw(); }
+    });
+  }
+
+  // Draw the scene: floor, a scale on the left, the person, and the mirror
+  function draw() {
+    box.querySelectorAll(".sizepick button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.i === pick));
+    const s = sizes[pick], H = cmpState.height, B = cmpState.bottom;
+    const top = Math.max(H, B + s.h) + 20;          // tallest thing in the picture, plus some air
+    const W = 420, VH = 340, floor = VH - 24;
+    const k = (floor - 14) / top;                    // pixels per cm
+    const h = H * k;                                // the person's height in pixels
+    const px = 60, mx = px + h * .3 + 50;           // where the person and mirror stand
+    const y = cm => floor - cm * k;
+
+    // Ruler ticks every 50 cm (or every foot)
+    const step = cmpState.unit === "cm" ? 50 : 12 * IN;
+    let ticks = "";
+    for (let c = 0; c <= top; c += step)
+      ticks += `<line x1="34" x2="40" y1="${y(c)}" y2="${y(c)}" stroke="#A6A6A6"/>
+        <text x="30" y="${y(c) + 4}" text-anchor="end" font-size="10" fill="#6B5F51">${cmpState.unit === "cm" ? c : Math.round(c / IN / 12) + "′"}</text>`;
+
+    // A simple person shape, scaled to their height: head, body, two legs
+    const cx = px + h * .15, headR = h * .062, top0 = y(H);
+    const bodyTop = top0 + headR * 2 + h * .015, hip = y(H * .48);
+    const person = `<g fill="#CAC8C5">
+      <circle cx="${cx}" cy="${top0 + headR}" r="${headR}"/>
+      <rect x="${cx - h * .09}" y="${bodyTop}" width="${h * .18}" height="${hip - bodyTop}" rx="${h * .04}"/>
+      <rect x="${cx - h * .075}" y="${hip - 4}" width="${h * .065}" height="${floor - hip + 4}" rx="${h * .02}"/>
+      <rect x="${cx + h * .01}" y="${hip - 4}" width="${h * .065}" height="${floor - hip + 4}" rx="${h * .02}"/></g>
+      <line x1="${cx - h * .12}" x2="${mx + s.w * k + 10}" y1="${y(H * .93)}" y2="${y(H * .93)}" stroke="#A68B69" stroke-dasharray="4 4"/>
+      <text x="${mx + s.w * k + 14}" y="${y(H * .93) + 4}" font-size="10" fill="#7A6140">eye level</text>`;
+
+    // The mirror, in the right shape for its collection
+    const mw = s.w * k, mh = s.h * k, mxL = mx, myT = y(B + s.h);
+    let shape;
+    if (s.round || isRound) shape = `<ellipse cx="${mxL + mw / 2}" cy="${myT + mh / 2}" rx="${mw / 2}" ry="${mh / 2}"/>`;
+    else if (p.cat === "Capsule") shape = `<rect x="${mxL}" y="${myT}" width="${mw}" height="${mh}" rx="${Math.min(mw, mh) / 2}"/>`;
+    else if (p.cat === "Arch") { const r = Math.min(mw / 2, mh);
+      shape = `<path d="M${mxL} ${myT + mh} V${myT + r} A${mw / 2} ${r} 0 0 1 ${mxL + mw} ${myT + r} V${myT + mh} Z"/>`; }
+    else if (p.cat === "Irregular") shape = `<path d="M${mxL + mw * .2} ${myT} C${mxL + mw * .9} ${myT - mh * .02} ${mxL + mw * 1.02} ${myT + mh * .35} ${mxL + mw * .92} ${myT + mh * .6}
+        S${mxL + mw * .7} ${myT + mh} ${mxL + mw * .35} ${myT + mh} S${mxL - mw * .02} ${myT + mh * .7} ${mxL + mw * .05} ${myT + mh * .4} S${mxL} ${myT + mh * .02} ${mxL + mw * .2} ${myT} Z"/>`;
+    else shape = `<rect x="${mxL}" y="${myT}" width="${mw}" height="${mh}" rx="2"/>`;
+
+    svg.setAttribute("viewBox", `0 0 ${Math.max(W, mx + mw + 70)} ${VH}`);
+    svg.innerHTML = `${ticks}
+      <line x1="40" x2="${Math.max(W, mx + mw + 70)}" y1="${floor}" y2="${floor}" stroke="#2B241C" stroke-width="1.5"/>
+      ${person}
+      <g fill="#E8E2D6" stroke="#A68B69" stroke-width="4">${shape}</g>
+      <text x="${cx}" y="${floor + 16}" text-anchor="middle" font-size="11" fill="#2B241C">You · ${fmt(H)}</text>
+      <text x="${mxL + mw / 2}" y="${floor + 16}" text-anchor="middle" font-size="11" fill="#2B241C">${fmt(s.w)} × ${fmt(s.h)}</text>`;
+
+    // Plain-language result. Physics tip: to see your whole body, a mirror only needs to be
+    // half your height, with its top edge a little above your eyes.
+    // A mirror shows you twice as much as its own size: the lowest point you can see is
+    // (2 × bottom edge − eye height), the highest is (2 × top edge − eye height).
+    const pct = Math.round(s.h / H * 100);
+    const eye = H * .93, topEdge = B + s.h;
+    const lowSeen = 2 * B - eye, highSeen = 2 * topEdge - eye;
+    let msg = `This mirror is <b>${fmt(s.h)}</b> tall, about <b>${pct}%</b> of your height. `;
+    if (topEdge < eye) msg += "Its top edge sits below your eyes, so you would have to bend to see yourself. Try hanging it higher.";
+    else if (lowSeen <= 0 && highSeen >= H) msg += "At this placement you can see your <b>whole body</b>, head to toe.";
+    else msg += `Standing in front of it you'll see from ${highSeen >= H ? "<b>the top of your head</b>" : "about <b>" + fmt(highSeen) + "</b>"}
+      down to ${lowSeen <= 0 ? "<b>your feet</b>" : "about <b>" + fmt(lowSeen) + "</b> from the floor"}.`;
+    if (s.h < H / 2) msg += ` <span class="hint">For a full-body view you need at least ${fmt(H / 2)}.</span>`;
+    box.querySelector("#verdict").innerHTML = msg;
+  }
+
+  box.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { cmpState.unit = b.dataset.u; saveCmp(); drawInputs(); draw(); }));
+  box.querySelectorAll(".sizepick button").forEach(b => b.addEventListener("click", () => {
+    pick = +b.dataset.i; cmpState.bottom = null; drawInputs(); draw(); }));
+  drawInputs(); draw();
 }
 
 // Close the pop-up with the × button or by clicking the dark area outside it
