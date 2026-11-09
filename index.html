@@ -138,6 +138,7 @@ td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
 .seg button { border: 0; background: none; padding: 7px 14px; cursor: pointer; font: 600 .72rem var(--font-label); letter-spacing: .1em; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.seg-size { margin-bottom: 10px; }
 .sizepick { display: flex; flex-wrap: wrap; gap: 6px; }
 .sizepick button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 6px 12px; cursor: pointer;
   font: 500 .78rem var(--font-label); color: var(--ink); }
@@ -798,13 +799,28 @@ function parseSize(text) {
 }
 
 // Remember the customer's height while they browse (and next visit, if the browser allows)
-const cmpState = { unit: "cm", height: 165, bottom: null };
+const cmpState = { unit: "cm", height: 165, bottom: null, sizeUnit: null };
 try { const s = JSON.parse(localStorage.getItem("mirroraHeight")); if (s) Object.assign(cmpState, s, { bottom: null }); } catch (e) {}
 function saveCmp() { try { localStorage.setItem("mirroraHeight", JSON.stringify({ unit: cmpState.unit, height: cmpState.height })); } catch (e) {} }
 
 const fmt = cm => cmpState.unit === "cm"
   ? Math.round(cm) + " cm"
   : (() => { const i = Math.round(cm / IN); return Math.floor(i / 12) + "′ " + (i % 12) + "″"; })();
+
+// Write a mirror size in the unit the customer picked:
+//   cm -> "61 × 152 cm"   in -> "24 × 60 in"   ft -> "2′ 0″ × 5′ 0″"
+function sizeText(s, unit) {
+  const one = cm => {
+    if (unit === "cm") return String(Math.round(cm));
+    const inches = cm / IN;
+    if (unit === "in") return String(Math.round(inches * 10) / 10);   // one decimal at most, e.g. 23.6
+    const r = Math.round(inches);
+    return Math.floor(r / 12) + "′ " + (r % 12) + "″";
+  };
+  const end = unit === "ft" ? "" : " " + unit;
+  if (s.round) return one(s.w) + end + " diameter";
+  return one(s.w) + " × " + one(s.h) + end;
+}
 
 function buildCompare(p, box) {
   const sizes = p.sizes.map(s => ({ label: s[0], text: s[1], ...parseSize(s[1]) })).filter(s => s.w);
@@ -823,7 +839,10 @@ function buildCompare(p, box) {
         <div class="field" id="hField"></div>
         <div class="field">
           <span class="lbl">Mirror size</span>
-          <div class="sizepick">${sizes.map((s, i) => `<button data-i="${i}">${s.text}</button>`).join("")}</div>
+          <div class="seg seg-size" role="group" aria-label="Mirror size units">
+            <button data-su="cm">CM</button><button data-su="ft">FT</button><button data-su="in">IN</button>
+          </div>
+          <div class="sizepick"></div>
         </div>
         <div class="field">
           <label for="bIn">Bottom edge from floor</label>
@@ -841,7 +860,7 @@ function buildCompare(p, box) {
 
   // Height input: one box for cm, two boxes for feet + inches
   function drawInputs() {
-    box.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === cmpState.unit));
+    box.querySelectorAll(".seg button[data-u]").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === cmpState.unit));
     const hf = box.querySelector("#hField"), br = box.querySelector("#bRow");
     const s = sizes[pick];
     if (cmpState.bottom === null) cmpState.bottom = s.h >= 140 ? 5 : 100;   // sensible starting point
@@ -933,9 +952,20 @@ function buildCompare(p, box) {
     box.querySelector("#verdict").innerHTML = msg;
   }
 
-  box.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { cmpState.unit = b.dataset.u; saveCmp(); drawInputs(); draw(); }));
-  box.querySelectorAll(".sizepick button").forEach(b => b.addEventListener("click", () => {
-    pick = +b.dataset.i; cmpState.bottom = null; drawInputs(); draw(); }));
+  box.querySelectorAll(".seg button[data-u]").forEach(b => b.addEventListener("click", () => { cmpState.unit = b.dataset.u; saveCmp(); drawInputs(); draw(); }));
+  // MIRROR SIZE buttons, written in CM, FT or IN. Starts in the unit the sizes are listed in.
+  const listedIn = /\bin\b/.test(p.sizes[0][1]) && !/cm/.test(p.sizes[0][1]) ? "in" : "cm";
+  function drawSizes() {
+    const u = cmpState.sizeUnit || listedIn;
+    box.querySelectorAll(".seg button[data-su]").forEach(b => b.setAttribute("aria-pressed", b.dataset.su === u));
+    const pickBox = box.querySelector(".sizepick");
+    pickBox.innerHTML = sizes.map((s, i) => `<button data-i="${i}">${sizeText(s, u)}</button>`).join("");
+    pickBox.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      pick = +b.dataset.i; cmpState.bottom = null; drawInputs(); draw(); }));
+  }
+  box.querySelectorAll(".seg button[data-su]").forEach(b => b.addEventListener("click", () => {
+    cmpState.sizeUnit = b.dataset.su; drawSizes(); draw(); }));
+  drawSizes();
   drawInputs(); draw();
 }
 
