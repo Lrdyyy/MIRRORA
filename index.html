@@ -535,6 +535,18 @@ const FRAMELESS = [
 ];
 const isFrameless = p => FRAMELESS.includes(p.id);
 
+/* LED MIRRORS: found automatically. A mirror counts as LED when its name says "LED" or
+   "Backlights", or one of its notes mentions lights/backlights (but not "Add Php ... for
+   backlights", because there the lights are an optional extra).
+   To force a mirror in or out, add its id to LED_ADD or LED_REMOVE. */
+const LED_ADD = [];
+const LED_REMOVE = [];
+const hasLED = p => {
+  if (LED_ADD.includes(p.id)) return true;
+  if (LED_REMOVE.includes(p.id)) return false;
+  return /\bLED\b|backlight/i.test(p.name) || p.notes.some(n => /lights/i.test(n) && !/^add/i.test(n));
+};
+
 /* SHAREABLE LINKS: each shape gets a short name used at the end of the web address.
    "Rectangle (MIMI)" -> "rectangle", so the link is  yoursite.com/#rectangle
    Subheadings add "-with-frame" or "-frameless":    yoursite.com/#arch-frameless */
@@ -645,15 +657,19 @@ function drawGrid() {
   const groups = [["With frame", "with-frame", mine.filter(p => !isFrameless(p))],
                   ["Frameless",  "frameless",  mine.filter(p => isFrameless(p))]]
                  .filter(g => g[2].length);       // skip a group with no mirrors (e.g. Grid has no frameless)
-  if (!groups.some(g => g[1] === frameView)) frameView = "all";
+  const leds = mine.filter(hasLED);
+  // the switch's buttons: All, then each frame group, then LED
+  const views = [["All", "all"], ...groups.map(g => [g[0], g[1]])];
+  if (leds.length) views.push(["LED", "led"]);
+  if (!views.some(v => v[1] === frameView)) frameView = "all";
 
-  // VIEW SWITCH: All / With frame / Frameless (only shown when the shape has both kinds)
-  if (groups.length > 1) {
+  // VIEW SWITCH: All / With frame / Frameless / LED (shown when there is something to choose between)
+  if (views.length > 2 && mine.length > 1) {   // a shape with only one mirror doesn't need it
     const seg = document.createElement("div");
     seg.className = "viewseg";
     seg.setAttribute("role", "group");
-    seg.setAttribute("aria-label", "Show frame type");
-    [["All", "all"], ...groups.map(g => [g[0], g[1]])].forEach(([label, key]) => {
+    seg.setAttribute("aria-label", "Show mirror type");
+    views.forEach(([label, key]) => {
       const b = document.createElement("button");
       b.type = "button";
       b.textContent = label;
@@ -664,7 +680,9 @@ function drawGrid() {
     grid.appendChild(seg);
   }
 
-  groups.filter(g => frameView === "all" || g[1] === frameView).forEach(([title, end, list]) => {
+  const shown = frameView === "led" ? [["LED", "led", leds]]
+              : groups.filter(g => frameView === "all" || g[1] === frameView);
+  shown.forEach(([title, end, list]) => {
     const shelf = document.createElement("section");
     shelf.className = "shelf";
     shelf.id = id + "-" + end;                     // e.g. yoursite.com/#arch-frameless still works
@@ -682,7 +700,7 @@ function openFromLink() {
   if (!cat) return;                                // #top, #contact, #collections: let the browser handle those
   active = cat;
   const end = hash.slice(slug(cat).length + 1);
-  frameView = ["with-frame", "frameless"].includes(end) ? end : "all";
+  frameView = ["with-frame", "frameless", "led"].includes(end) ? end : "all";
   drawChips();
   drawGrid();
   const target = document.getElementById(hash) || document.getElementById(slug(cat));
