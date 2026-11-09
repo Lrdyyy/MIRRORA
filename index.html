@@ -148,6 +148,21 @@ td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
 .hint { font-size: .82rem; color: var(--muted); margin: 6px 0 0; }
 @media (max-width: 760px) { .cmp-grid { grid-template-columns: 1fr; } }
 
+/* ---- Shape heading + "With frame" / "Frameless" subheadings (with shareable links) ---- */
+.shelf { margin-bottom: 44px; }
+.shelf:last-child { margin-bottom: 0; }
+.shelf-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 22px; }
+.shelf-head h3 { font-size: 1.35rem; text-transform: uppercase; letter-spacing: .04em; }
+.shelf-head h3 small { font: 500 .8rem var(--font-label); color: var(--muted); letter-spacing: .08em; margin-left: 8px; text-transform: none; }
+.cat-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 26px; }
+.cat-head h3 { font-size: clamp(1.4rem, 3vw, 1.8rem); text-transform: uppercase; }
+.linkbtn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line); background: transparent; color: var(--tan-dark);
+  font: 600 .7rem var(--font-label); letter-spacing: .12em; text-transform: uppercase; }
+.linkbtn:hover { border-color: var(--tan); background: var(--sand); }
+.linkbtn.done { border-color: var(--tan-dark); background: var(--tan); color: var(--ink); }
+
 /* ---- Footer ---- */
 footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
 .foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
@@ -196,7 +211,7 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
         <h2>The collections</h2>
         <p class="lede">Choose a shape, then open a mirror to see sizes and prices.</p>
         <div class="chips" id="chips" role="group" aria-label="Filter by shape"></div>
-        <div class="grid" id="grid"></div>
+        <div id="grid"></div>
       </div>
     </section>
 
@@ -479,6 +494,23 @@ const PRODUCTS = [
 
 const CATEGORIES = ["All", "Rectangle (MIMI)", "Capsule", "Arch", "Irregular", "Grid", "Round", "Ultrafragola"];
 
+/* FRAMELESS MIRRORS: list the id of every mirror that has NO frame.
+   Every mirror NOT in this list shows under "With frame".
+   To move a mirror to the other group, add or remove its id here. */
+const FRAMELESS = [
+  "mimi-backlights", "mimi-led-whole", "mimi-led-vanity", "tita",          // Rectangle
+  "phoem-backlights", "phoem-led-edge",                                     // Capsule
+  "viv-led-frameless", "viv-led-vanity",                                    // Arch
+  "tiki", "poppy", "rosso", "sonoma", "fiji", "fiji-wave", "frau",          // Irregular
+  "faith-backlights", "faith-led"                                           // Round
+];
+const isFrameless = p => FRAMELESS.includes(p.id);
+
+/* SHAREABLE LINKS: each shape gets a short name used at the end of the web address.
+   "Rectangle (MIMI)" -> "rectangle", so the link is  yoursite.com/#rectangle
+   Subheadings add "-with-frame" or "-frameless":    yoursite.com/#arch-frameless */
+const slug = cat => cat.toLowerCase().split(" ")[0];
+
 /* ---------- PART 3: THE CODE THAT DRAWS THE PAGE ---------- */
 
 // A helper: turn 8499 into "Php 8,499"
@@ -500,27 +532,115 @@ function drawChips() {
     b.className = "chip";
     b.textContent = cat;
     b.setAttribute("aria-pressed", cat === active);
-    b.addEventListener("click", () => { active = cat; drawChips(); drawGrid(); });
+    b.addEventListener("click", () => { selectShape(cat); });
     chipsBox.appendChild(b);
   });
 }
 
-// 2) Draw the product cards (only the ones matching the chip)
+// Pick a shape: redraw, and put that shape's link in the address bar
+// (replaceState changes the address without jumping the page, so the
+//  customer, or you, can copy it straight from the browser)
+function selectShape(cat) {
+  active = cat;
+  drawChips();
+  drawGrid();
+  const hash = cat === "All" ? "#collections" : "#" + slug(cat);
+  history.replaceState(null, "", location.pathname + location.search + hash);
+}
+
+// The full web address for a shape or subheading, e.g. https://mirrora.vercel.app/#arch-frameless
+const linkFor = id => location.origin + location.pathname + "#" + id;
+
+// A small "Copy link" button. Clicking it copies the address and says "Link copied!"
+function copyButton(id, label) {
+  const b = document.createElement("button");
+  b.className = "linkbtn";
+  b.type = "button";
+  b.setAttribute("aria-label", "Copy link to " + label);
+  b.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+    <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+    <span>Copy link</span>`;
+  b.addEventListener("click", async () => {
+    const url = linkFor(id);
+    const text = b.querySelector("span");
+    try { await navigator.clipboard.writeText(url); text.textContent = "Link copied!"; }
+    catch (e) { text.textContent = url; }          // if copying is blocked, show the link so it can be copied by hand
+    b.classList.add("done");
+    history.replaceState(null, "", "#" + id);
+    setTimeout(() => { text.textContent = "Copy link"; b.classList.remove("done"); }, 2200);
+  });
+  return b;
+}
+
+// One product card
+function makeCard(p) {
+  const card = document.createElement("button");
+  card.className = "card";
+  const from = p.soon ? "Ask us for details" : "From " + php(Math.min(...p.sizes.map(s => s[2])));
+  const photo = `<span class="pwrap">${p.images.length
+    ? `<img class="photo" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
+    : `<span class="ph">Photos coming soon</span>`}</span>`;
+  const tag = active === "All" ? p.cat : (isFrameless(p) ? "Frameless" : "With frame");
+  card.innerHTML = `${photo}<p class="tag">${tag}</p><h3>${p.name}</h3><p class="price">${from}</p>`;
+  card.addEventListener("click", () => openModal(p));
+  addTilt(card);
+  return card;
+}
+
+// A block of cards in the usual grid layout
+function makeGrid(list) {
+  const g = document.createElement("div");
+  g.className = "grid";
+  list.forEach(p => g.appendChild(makeCard(p)));
+  return g;
+}
+
+// 2) Draw the product cards
+//    "All"          -> one grid of every mirror
+//    a single shape -> the shape's heading, then "With frame" and "Frameless" subheadings
 function drawGrid() {
   grid.innerHTML = "";
-  PRODUCTS.filter(p => active === "All" || p.cat === active).forEach(p => {
-    const card = document.createElement("button");
-    card.className = "card";
-    const from = p.soon ? "Ask us for details" : "From " + php(Math.min(...p.sizes.map(s => s[2])));
-    const photo = `<span class="pwrap">${p.images.length
-      ? `<img class="photo" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-      : `<span class="ph">Photos coming soon</span>`}</span>`;
-    card.innerHTML = `${photo}<p class="tag">${p.cat}</p><h3>${p.name}</h3><p class="price">${from}</p>`;
-    card.addEventListener("click", () => openModal(p));
-    addTilt(card);
-    grid.appendChild(card);
+  if (active === "All") { grid.appendChild(makeGrid(PRODUCTS)); return; }
+
+  const id = slug(active);
+  const head = document.createElement("div");
+  head.className = "cat-head";
+  head.id = id;                                    // so yoursite.com/#arch lands here
+  head.innerHTML = `<h3>${active}</h3>`;
+  head.appendChild(copyButton(id, active));
+  grid.appendChild(head);
+
+  const mine = PRODUCTS.filter(p => p.cat === active);
+  [["With frame", "with-frame", mine.filter(p => !isFrameless(p))],
+   ["Frameless",  "frameless",  mine.filter(p => isFrameless(p))]].forEach(([title, end, list]) => {
+    if (!list.length) return;                      // skip a subheading with no mirrors (e.g. Grid has no frameless)
+    const shelf = document.createElement("section");
+    shelf.className = "shelf";
+    shelf.id = id + "-" + end;                     // e.g. yoursite.com/#arch-frameless
+    const h = document.createElement("div");
+    h.className = "shelf-head";
+    h.innerHTML = `<h3>${title} <small>${list.length} ${list.length === 1 ? "design" : "designs"}</small></h3>`;
+    h.appendChild(copyButton(shelf.id, active + " " + title));
+    shelf.appendChild(h);
+    shelf.appendChild(makeGrid(list));
+    grid.appendChild(shelf);
   });
 }
+
+// Open the right shape when someone arrives from a shared link like  #round  or  #arch-frameless
+function openFromLink() {
+  const hash = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+  if (!hash) return;
+  const cat = CATEGORIES.find(c => c !== "All" && (hash === slug(c) || hash.startsWith(slug(c) + "-")));
+  if (!cat) return;                                // #top, #contact, #collections: let the browser handle those
+  active = cat;
+  drawChips();
+  drawGrid();
+  const target = document.getElementById(hash) || document.getElementById(slug(cat));
+  // wait one frame so the new cards are on the page before scrolling to them
+  requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
+}
+window.addEventListener("hashchange", openFromLink);
 
 // 2b) HOVER FLOAT: tilt the photo toward the mouse.
 // We measure where the pointer is inside the photo (0 to 1 across, 0 to 1 down)
@@ -763,6 +883,7 @@ document.getElementById("mailBtn").href = "mailto:" + CONTACT.email;
 // Go!
 drawChips();
 drawGrid();
+openFromLink();   // if the address ends in a shape link, open that shape
 
 </script>
 
