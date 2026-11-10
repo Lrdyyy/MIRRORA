@@ -1,20 +1,9 @@
-/* ============================================================
-   MIRRORA: behavior + product list
-   Part 1: your contact details   (edit these first!)
-   Part 2: your products          (add or edit mirrors here)
-   Part 3: code that draws the page (you rarely need to touch it)
-   ============================================================ */
 
-/* ---------- PART 1: CONTACT DETAILS ----------
-   CHANGE THESE two values to your real ones. */
 const CONTACT = {
-  messenger: "https://m.me/YOUR-PAGE-NAME",   // your Facebook page's Messenger link
-  email: "hello@yourdomain.com"
+  messenger: "https://m.me/217532241448780",  
+  email: "mirrora.ph@gmail.com"
 };
 
-/* ---------- PART 2: PRODUCTS ----------
-   Each mirror is an object { ... } inside the [ ] list.
-   sizes: [ [label, dimensions, price], ... ]   prices are plain numbers (no commas). */
 const HOOKS = "Back hooks included upon request";
 const LED = ["Tri-color lights (3000K to 6500K)", "Single touch switch system", "Ready to plug & play", HOOKS];
 const ALU = ["Available in Gold / Black / Custom color", "Backstand free upon request", "Back hooks free upon request"];
@@ -26,7 +15,6 @@ const LED_TALL = [["Small", "60 × 150 cm", 0], ["Mid", "60 × 180 cm", 0], ["La
                   ["Big", "80 × 150 cm", 0], ["Full", "80 × 180 cm", 0], ["Extra", "80 × 210 cm", 0]];
 const LED_VAN = [["Small", "60 × 80 cm", 0], ["Mid", "60 × 100 cm", 0], ["Large", "60 × 120 cm", 0],
                  ["Big", "80 × 90 cm", 0], ["Full", "80 × 100 cm", 0], ["Extra", "80 × 120 cm", 0]];
-// A helper so each size list only needs the six prices: priced(LED_TALL, [14500, ...])
 const priced = (sizes, prices) => sizes.map((s, i) => [s[0], s[1], prices[i]]);
 const CAPSULE_SIZES = [["Bathroom / Vanity", "18 × 36 in", 0], ["Bathroom / Vanity", "24 × 40 in", 0], ["Whole body", "24 × 60 in", 0], ["Full size", "30 × 60 in", 0]];
 const BACKLIGHT_ONE = ["One-color backlights", "Ready to plug & play", "Back hooks included"];
@@ -39,7 +27,6 @@ const ROUND_WOODNOTES = ["Solid wood frame", "Available in wood stain or solid c
 const ACCENT_USE = "Bedroom / Vanity / Accent / Centerpiece";
 
 const PRODUCTS = [
-  /* ---------- RECTANGLE (MIMI + TITA) ---------- */
   { id: "mimi-alu", name: "MIMI Rectangle Mirror with Aluminum Frames", cat: "Rectangle (MIMI)",
     use: "Whole body mirror", images: ["images/mimi-alu.jpg"], sizes: ALU_SIZES, notes: ALU },
   { id: "mimi-wood", name: "MIMI Rectangle Mirror with Wood Frame", cat: "Rectangle (MIMI)",
