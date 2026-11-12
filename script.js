@@ -2,7 +2,7 @@ const CONTACT = {
   messenger: "https://m.me/217532241448780",
   email: "mirrora.ph@gmail.com"
 };
- 
+
 const HOOKS = "Back hooks included upon request";
 const LED = ["Tri-color lights (3000K to 6500K)", "Single touch switch system", "Ready to plug & play", HOOKS];
 const ALU = ["Available in Gold / Black / Custom color", "Backstand free upon request", "Back hooks free upon request"];
@@ -14,18 +14,20 @@ const LED_TALL = [["Small", "60 × 150 cm", 0], ["Mid", "60 × 180 cm", 0], ["La
                   ["Big", "80 × 150 cm", 0], ["Full", "80 × 180 cm", 0], ["Extra", "80 × 210 cm", 0]];
 const LED_VAN = [["Small", "60 × 80 cm", 0], ["Mid", "60 × 100 cm", 0], ["Large", "60 × 120 cm", 0],
                  ["Big", "80 × 90 cm", 0], ["Full", "80 × 100 cm", 0], ["Extra", "80 × 120 cm", 0]];
+
 const priced = (sizes, prices) => sizes.map((s, i) => [s[0], s[1], prices[i]]);
 const CAPSULE_SIZES = [["Bathroom / Vanity", "18 × 36 in", 0], ["Bathroom / Vanity", "24 × 40 in", 0], ["Whole body", "24 × 60 in", 0], ["Full size", "30 × 60 in", 0]];
 const BACKLIGHT_ONE = ["One-color backlights", "Ready to plug & play", "Back hooks included"];
 const BIG_IRR = [["Small", "50 × 25 in", 7499], ["Medium", "60 × 30 in", 7899], ["Large", "70 × 35 in", 8499]];
- 
+
 const ROUND_SIZES = [["Small", "60 cm diameter", 0], ["Mid", "80 cm diameter", 0], ["Large", "100 cm diameter", 0],
                      ["Big", "120 cm diameter", 0], ["Full", "150 cm diameter", 0], ["Extra", "180 cm diameter", 0]];
 const ROUND_USE = "Bathroom / Vanity / Powder room";
 const ROUND_WOODNOTES = ["Solid wood frame", "Available in wood stain or solid color paint", HOOKS];
 const ACCENT_USE = "Bedroom / Vanity / Accent / Centerpiece";
- 
+
 const PRODUCTS = [
+
   { id: "mimi-alu", name: "MIMI Rectangle Mirror with Aluminum Frames", cat: "Rectangle (MIMI)",
     use: "Whole body mirror", images: ["images/mimi-alu.jpg"], sizes: ALU_SIZES, notes: ALU },
   { id: "mimi-wood", name: "MIMI Rectangle Mirror with Wood Frame", cat: "Rectangle (MIMI)",
@@ -44,7 +46,7 @@ const PRODUCTS = [
   { id: "mimi-led-alu", name: "MIMI Rectangle LED Mirror with Aluminum Frame", cat: "Rectangle (MIMI)",
     use: "Bedroom / Whole body use", images: ["images/mimi-led-alu.jpg"],
     sizes: priced(LED_TALL, [13500, 14800, 16100, 14500, 15800, 16800]), notes: LED },
- 
+
   { id: "tita", name: "TITA Mirror with Backlights", cat: "Rectangle (MIMI)",
     use: "Bedroom / Vanity use", images: ["images/tita.jpg"],
     sizes: priced(LED_VAN, [7500, 9800, 11400, 9000, 11500, 12500]), notes: LED },
@@ -60,7 +62,7 @@ const PRODUCTS = [
   { id: "tita-wood", name: "TITA Mirror with Wood Frame", cat: "Rectangle (MIMI)",
     use: "Vanity / Walk-in / Whole body", images: ["images/tita-wood.jpg"],
     sizes: [["Bathroom / Vanity", "24 × 60 in", 12499], ["Bathroom / Vanity", "30 × 72 in", 14499], ["Whole body", "48 × 72 in", 15899], ["Full", "36 × 84 in", 16899]], notes: WOOD },
- 
+
   { id: "phoem-led", name: "PHOEM Capsule Mirror with LED & Aluminum Frame", cat: "Capsule",
     use: "Bathroom / Vanity / Walk-in / Whole body", images: ["images/phoem-led.jpg"],
     sizes: priced(CAPSULE_SIZES, [10499, 12499, 14299, 15599]),
@@ -86,7 +88,7 @@ const PRODUCTS = [
     use: "Bathroom / Vanity / Powder room", images: ["images/anika.jpg"],
     sizes: [["Small", "15 × 30 in", 7899], ["Medium", "20 × 40 in", 9699], ["Large", "24 × 60 in", 12499]],
     notes: ["Solid wood frame + leather strap", "Available in wood stain or solid color paint", HOOKS] },
- 
+
   { id: "viv-led", name: "VIV Arch LED Mirror with Aluminum Frame", cat: "Arch",
     use: "Bedroom / Whole body use", images: ["images/viv-led.jpg"],
     sizes: priced(LED_TALL, [14500, 15800, 17800, 15500, 16800, 18500]), notes: LED },
@@ -113,7 +115,7 @@ const PRODUCTS = [
   { id: "viv-alu-vanity", name: "VIV Arch Mirror with Aluminum Frames (Vanity)", cat: "Arch",
     use: "Bedroom / Bathroom / Vanity use", images: ["images/viv-alu-vanity.jpg"],
     sizes: [["Bathroom / Vanity", "24 × 30 in", 5699], ["Bathroom / Vanity", "24 × 48 in", 6299]], notes: ALU },
- 
+
   { id: "tiki", name: "TIKI Irregular Mirror", cat: "Irregular",
     use: "Bathroom / Vanity / Walk-in / Whole body", images: ["images/tiki.jpg"],
     sizes: [["Small", "51 × 28 in", 7499], ["Medium", "65 × 32 in", 8499], ["Large", "67 × 44 in", 9499]], notes: BACKLIGHT_ONE },
@@ -143,7 +145,7 @@ const PRODUCTS = [
     use: "Bedroom / Vanity / Powder room / Whole body", images: ["images/frau.jpg"],
     sizes: [["Small", "25 × 43 in", 5599], ["Whole body", "42 × 60 in", 7299], ["Full", "54 × 72 in", 9899]],
     notes: ["Add Php 2,000 for one-color backlights", HOOKS] },
- 
+
   { id: "grid-mirror", name: "GRID Mirror", cat: "Grid",
     use: "Bedroom / Table top / Whole body", images: ["images/grid-living.jpg", "images/grid-bedroom.jpg"],
     sizes: [["Table top", "30 × 30 in", 8499], ["Whole body", "30 × 60 in", 12499], ["Full", "48 × 72 in", 14499]], notes: GRIDN },
@@ -159,19 +161,19 @@ const PRODUCTS = [
   { id: "amalfi", name: "GRID MIRROR in Amalfi", cat: "Grid",
     use: "Bedroom / Table top / Dining", images: ["images/amalfi.jpg"],
     sizes: [["One size only", "48 × 24 in", 7899]], notes: GRIDN },
- 
+
   { id: "faith-wood", name: "FAITH Round Mirror with Wood Frame", cat: "Round",
     use: "Bathroom / Vanity / Powder room", images: ["images/faith-wood.jpg"],
     sizes: [["Small", "60 cm diameter", 3999], ["Mid", "80 cm diameter", 5999], ["Large", "100 cm diameter", 9699],
             ["Big", "120 cm diameter", 10299], ["Full", "150 cm diameter", 15499], ["Extra", "180 cm diameter", 18899]],
     notes: ["Solid wood frame", "Available in wood stain or solid color paint", HOOKS] },
- 
+
   { id: "faith-strap", name: "FAITH Round Mirror with Wood Frame & PU Leather Strap", cat: "Round",
     use: "Bathroom / Vanity / Powder room", images: ["images/faith-strap.jpg"],
     sizes: [["Small", "60 cm diameter", 5999], ["Mid", "80 cm diameter", 7999], ["Large", "100 cm diameter", 11699],
             ["Big", "120 cm diameter", 12299], ["Full", "150 cm diameter", 17499], ["Extra", "180 cm diameter", 20899]],
     notes: ["Solid wood frame", "Available in wood stain or solid color paint", HOOKS] },
- 
+
   { id: "faith-sunrays", name: "FAITH Round Mirror with Sunrays Rattan Frame", cat: "Round",
     use: "Bathroom / Vanity / Powder room", images: ["images/faith-sunrays.jpg"],
     sizes: [["One size only", "100 cm diameter", 15499]],
@@ -213,24 +215,24 @@ const PRODUCTS = [
     use: ACCENT_USE, images: ["images/sola.jpg"],
     sizes: [["One size only", "85 × 85 cm", 7999]],
     notes: ["Available in Black", "Back hooks included", "Not available for customization"] },
- 
+
   { id: "ultrafragola", name: "ULTRAFRAGOLA Mirror", cat: "Ultrafragola",
     use: "Bathroom / Vanity / Walk-in / Whole body", images: ["images/ultrafragola.jpg"],
     sizes: [["One size only", "100 cm L × 195 cm H", 40000]],
     notes: ["Up to 20+ colored lights", "Remote control operated", "Ready to plug & play", "Back hooks included"] }
 ];
- 
+
 const CATEGORIES = ["All", "Rectangle (MIMI)", "Capsule", "Arch", "Irregular", "Grid", "Round", "Ultrafragola"];
- 
+
 const php = n => "Php " + n.toLocaleString("en-US");
- 
+
 const chipsBox = document.getElementById("chips");
 const grid     = document.getElementById("grid");
 const modal    = document.getElementById("modal");
 const mBody    = document.getElementById("mBody");
- 
+
 let active = "All";
- 
+
 function drawChips() {
   chipsBox.innerHTML = "";
   CATEGORIES.forEach(cat => {
@@ -242,12 +244,13 @@ function drawChips() {
     chipsBox.appendChild(b);
   });
 }
- 
+
 function drawGrid() {
   grid.innerHTML = "";
-  PRODUCTS.filter(p => active === "All" || p.cat === active).forEach(p => {
+  PRODUCTS.filter(p => active === "All" || p.cat === active).forEach((p, i) => {
     const card = document.createElement("button");
     card.className = "card";
+    card.style.setProperty("--i", Math.min(i, 12));
     const from = p.soon ? "Ask us for details" : "From " + php(Math.min(...p.sizes.map(s => s[2])));
     const photo = p.images.length
       ? `<img class="photo" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
@@ -257,7 +260,7 @@ function drawGrid() {
     grid.appendChild(card);
   });
 }
- 
+
 function openModal(p) {
   const mail = `mailto:${CONTACT.email}?subject=${encodeURIComponent("Inquiry: " + p.name)}`;
   const img  = p.images.length ? `<img class="m-img" id="mImg" src="${p.images[0]}" alt="${p.name}">` : "";
@@ -269,7 +272,7 @@ function openModal(p) {
     ? `<table>${p.sizes.map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${php(s[2])}</td></tr>`).join("")}</table>`
     : "";
   const notes = p.notes.length ? `<ul>${p.notes.map(n => `<li>${n}</li>`).join("")}</ul>` : "";
- 
+
   mBody.innerHTML = `${img}${thumbs}
     <div class="m-info">
       <p class="tag">${p.cat}</p><h2 id="mTitle">${p.name}</h2><p class="use">${p.use}</p>
@@ -279,21 +282,21 @@ function openModal(p) {
         <a class="btn outline" href="${mail}">Email us</a>
       </div>
     </div>`;
- 
+
   mBody.querySelectorAll(".thumbs button").forEach(btn => btn.addEventListener("click", () => {
     document.getElementById("mImg").src = p.images[btn.dataset.i];
     mBody.querySelectorAll(".thumbs button").forEach(b => b.setAttribute("aria-current", b === btn));
   }));
- 
+
   modal.showModal();
 }
- 
+
 document.getElementById("mClose").addEventListener("click", () => modal.close());
 modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
- 
+
 document.getElementById("msgBtn").href = CONTACT.messenger;
 document.getElementById("mailBtn").href = "mailto:" + CONTACT.email;
- 
+
 function closeBubbles() {
   document.querySelectorAll(".bubble").forEach(b => b.remove());
   document.querySelectorAll("[data-contact]").forEach(a => a.setAttribute("aria-expanded", "false"));
@@ -311,9 +314,17 @@ document.querySelectorAll("[data-contact]").forEach(btn => btn.addEventListener(
   btn.parentElement.appendChild(bubble);
   btn.setAttribute("aria-expanded", "true");
 }));
+
 document.addEventListener("click", e => { if (!e.target.closest(".pop")) closeBubbles(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeBubbles(); });
- 
+
+const revealEls = document.querySelectorAll("main section:not(.hero)");
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add("show"); io.unobserve(en.target); }
+  }), { threshold: 0.08 });
+  revealEls.forEach(el => { el.classList.add("reveal"); io.observe(el); });
+}
+
 drawChips();
 drawGrid();
- 
