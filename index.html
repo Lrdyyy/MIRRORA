@@ -1,12 +1,4 @@
 <!DOCTYPE html>
-<!--
-  MIRRORA PHILIPPINES: collections website.
-  Three files work together:
-    index.html = structure (this file)
-    style.css  = looks (colors, fonts, layout). The palette lives at the top of it.
-    script.js  = behavior + the product list. To add or edit a mirror, edit script.js.
-  Keep all three files AND the "images" folder together, then double-click index.html.
--->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -30,8 +22,7 @@
   </header>
 
   <main id="top">
-    <!-- HERO: headline on the left, an arch-shaped photo on the right -->
-    <section class="wrap hero">
+        <section class="wrap hero">
       <div>
         <p class="eyebrow">Mirrora Philippines</p>
         <h1>Mirrors made to fit your space.</h1>
@@ -44,8 +35,7 @@
       <img class="arch" src="images/tita.jpg" alt="Backlit mirror above a bathroom vanity">
     </section>
 
-    <!-- COLLECTIONS: the filter chips and cards are built by script.js -->
-    <section id="collections" class="block">
+        <section id="collections" class="block">
       <div class="wrap">
         <h2>The collections</h2>
         <p class="lede">Choose a shape, then open a mirror to see sizes and prices.</p>
@@ -62,8 +52,7 @@
       </div>
     </section>
 
-    <!-- CONTACT: the buttons get their links from script.js (CONTACT settings) -->
-    <section id="contact" class="block">
+        <section id="contact" class="block">
       <div class="wrap contact">
         <h2>Contact us now</h2>
         <p class="lede">Tell us the mirror, size and color you want, and we will reply with the details.</p>
@@ -82,8 +71,7 @@
     </div>
   </footer>
 
-  <!-- The pop-up. <dialog> is built into the browser: it handles Esc and the dark backdrop for us. -->
-  <dialog id="modal" aria-labelledby="mTitle">
+    <dialog id="modal" aria-labelledby="mTitle">
     <button class="close" id="mClose" aria-label="Close">×</button>
     <div id="mBody"></div>
   </dialog>
