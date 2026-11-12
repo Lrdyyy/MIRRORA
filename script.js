@@ -322,8 +322,9 @@ const revealEls = document.querySelectorAll("main section:not(.hero)");
 if ("IntersectionObserver" in window) {
   const io = new IntersectionObserver(entries => entries.forEach(en => {
     if (en.isIntersecting) { en.target.classList.add("show"); io.unobserve(en.target); }
-  }), { threshold: 0.08 });
+  }), { threshold: 0, rootMargin: "0px 0px -6% 0px" });
   revealEls.forEach(el => { el.classList.add("reveal"); io.observe(el); });
+  setTimeout(() => revealEls.forEach(el => el.classList.add("show")), 3000);
 }
 
 drawChips();
