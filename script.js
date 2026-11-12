@@ -278,7 +278,8 @@ function openModal(p) {
       <p class="tag">${p.cat}</p><h2 id="mTitle">${p.name}</h2><p class="use">${p.use}</p>
       ${table}${notes}
       <div class="actions">
-        <a class="btn" href="${CONTACT.messenger}" target="_blank" rel="noopener">Inquire on Messenger</a>
+        <button class="btn" type="button" id="orderBtn">Order now</button>
+        <a class="btn outline" href="${CONTACT.messenger}" target="_blank" rel="noopener">Inquire on Messenger</a>
         <a class="btn outline" href="${mail}">Email us</a>
       </div>
     </div>`;
@@ -288,8 +289,70 @@ function openModal(p) {
     mBody.querySelectorAll(".thumbs button").forEach(b => b.setAttribute("aria-current", b === btn));
   }));
 
+  document.getElementById("orderBtn").addEventListener("click", () => openOrder(p));
+
   modal.showModal();
 }
+
+const orderModal = document.getElementById("orderModal");
+const orderForm  = document.getElementById("orderForm");
+const oErr  = document.getElementById("oErr");
+const oNote = document.getElementById("oNote");
+let orderProduct = "";
+
+function openOrder(p) {
+  orderProduct = p.name;
+  orderForm.reset();
+  oErr.textContent = "";
+  oNote.textContent = "";
+  orderForm.querySelectorAll(".invalid").forEach(el => el.classList.remove("invalid"));
+  document.getElementById("oFor").textContent = p.name;
+  document.getElementById("oOrders").value = p.name + "\nSize: \nQuantity: 1";
+  orderModal.showModal();
+}
+
+function readOrder() {
+  const f = orderForm.elements;
+  const missing = [];
+  ["name", "address", "phone", "orders"].forEach(k => {
+    const el = f[k];
+    const bad = !el.value.trim();
+    el.classList.toggle("invalid", bad);
+    if (bad) missing.push(k === "phone" ? "contact number" : k);
+  });
+  if (missing.length) {
+    oErr.textContent = "Please fill in: " + missing.join(", ") + ".";
+    return null;
+  }
+  oErr.textContent = "";
+  return "New order - Mirrora Philippines\n\n" +
+    "Name: " + f.name.value.trim() + "\n" +
+    "Address: " + f.address.value.trim() + "\n" +
+    "Contact number: " + f.phone.value.trim() + "\n\n" +
+    "Orders:\n" + f.orders.value.trim();
+}
+
+orderForm.addEventListener("input", e => { e.target.classList.remove("invalid"); oErr.textContent = ""; });
+
+orderForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const text = readOrder();
+  if (!text) return;
+  const subject = "Order: " + orderProduct;
+  window.location.href = "mailto:" + CONTACT.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(text);
+  oNote.textContent = "Your email app should open with the order ready to send.";
+});
+
+document.getElementById("oMsg").addEventListener("click", async () => {
+  const text = readOrder();
+  if (!text) return;
+  try { await navigator.clipboard.writeText(text); oNote.textContent = "Order details copied. Paste them in the Messenger chat and send."; }
+  catch (err) { oNote.textContent = "Messenger is opening. Please type your order details in the chat."; }
+  window.open(CONTACT.messenger, "_blank", "noopener");
+});
+
+document.getElementById("oClose").addEventListener("click", () => orderModal.close());
+orderModal.addEventListener("click", e => { if (e.target === orderModal) orderModal.close(); });
 
 document.getElementById("mClose").addEventListener("click", () => modal.close());
 modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
