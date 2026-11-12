@@ -68,7 +68,6 @@ h3 { font-size: 1.2rem; font-weight: 600; }
 .card { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
 .card .photo, .card .ph { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 6px; background: var(--sand); }
 .card .ph { display: grid; place-items: center; color: var(--muted); font-size: .9rem; border: 1.5px dashed var(--tan); }
-.card:hover .photo { filter: brightness(.94); }
 .tag { font-family: var(--font-label); margin: 14px 0 2px; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--tan-dark); font-weight: 600; }
 .card h3 { margin-bottom: 4px; }
 .price { margin: 0; color: var(--muted); font-size: .92rem; }
@@ -115,10 +114,11 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
 .btn:active, .chip:active { transform: translateY(0) scale(.97); }
 
 @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-.card { animation: rise .5s ease both; animation-delay: calc(var(--i, 0) * 45ms); transition: transform .3s ease; }
-.card:hover { transform: translateY(-5px); }
-.card .photo { transition: filter .3s ease, box-shadow .3s ease; }
-.card:hover .photo { box-shadow: 0 14px 28px rgba(43, 36, 28, .22); }
+.card { animation: rise .5s ease both; animation-delay: calc(var(--i, 0) * 45ms); }
+.card .photo { transition: transform .4s cubic-bezier(.2, .8, .3, 1), box-shadow .4s ease; box-shadow: 0 2px 6px rgba(43, 36, 28, .08); }
+@keyframes bob { 0%, 100% { transform: translateY(-12px) scale(1.025); } 50% { transform: translateY(-17px) scale(1.025); } }
+.card:hover .photo, .card:focus-visible .photo { transform: translateY(-12px) scale(1.025); box-shadow: 0 28px 38px -14px rgba(43, 36, 28, .38);
+  animation: bob 2.4s ease-in-out .4s infinite; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 .hero > div, .hero .arch { animation: fadeUp .8s ease both; }
