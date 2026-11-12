@@ -140,3 +140,16 @@ dialog[open]::backdrop { animation: fadeIn .3s ease; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+dialog.order { width: min(460px, 94vw); }
+#orderForm { display: grid; gap: 12px; padding: 34px 24px 26px; text-align: left; max-height: 92vh; overflow-y: auto; }
+.order h2 { text-align: center; font-size: 1.5rem; padding: 0 28px; }
+.order label { display: grid; gap: 6px; font: 600 .72rem var(--font-label); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.order input, .order textarea { font: 400 1rem var(--font-body); letter-spacing: 0; text-transform: none; color: var(--ink); background: #fff;
+  border: 1.5px solid var(--line); border-radius: 8px; padding: 11px 12px; width: 100%; resize: vertical; }
+.order input:focus, .order textarea:focus { outline: none; border-color: var(--tan-dark); box-shadow: 0 0 0 3px rgba(166, 139, 105, .25); }
+.order .invalid { border-color: #b3261e; }
+.osub { margin: -6px 0 4px; text-align: center; color: var(--muted); font-size: .92rem; }
+.oerr { margin: 0; color: #b3261e; font-size: .88rem; min-height: 0; }
+.onote { margin: 0; color: var(--muted); font-size: .88rem; text-align: center; }
+.order .btn { text-align: center; width: 100%; }

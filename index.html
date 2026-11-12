@@ -71,7 +71,23 @@
     </div>
   </footer>
 
-    <dialog id="modal" aria-labelledby="mTitle">
+  <dialog id="orderModal" class="small order" aria-labelledby="oTitle">
+    <button class="close" id="oClose" aria-label="Close">×</button>
+    <form id="orderForm" class="choose" novalidate>
+      <h2 id="oTitle">Order now</h2>
+      <p class="osub" id="oFor"></p>
+      <label>Name<input id="oName" name="name" autocomplete="name" required></label>
+      <label>Address<textarea id="oAddress" name="address" rows="2" autocomplete="street-address" required></textarea></label>
+      <label>Contact number<input id="oPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required></label>
+      <label>Orders<textarea id="oOrders" name="orders" rows="4" required></textarea></label>
+      <p class="oerr" id="oErr" role="alert"></p>
+      <button class="btn" type="submit">Send order by email</button>
+      <button class="btn outline" type="button" id="oMsg">Send order on Messenger</button>
+      <p class="onote" id="oNote" role="status"></p>
+    </form>
+  </dialog>
+
+  <dialog id="modal" aria-labelledby="mTitle">
     <button class="close" id="mClose" aria-label="Close">×</button>
     <div id="mBody"></div>
   </dialog>
