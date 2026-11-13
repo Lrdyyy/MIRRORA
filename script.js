@@ -222,7 +222,10 @@ const PRODUCTS = [
     notes: ["Up to 20+ colored lights", "Remote control operated", "Ready to plug & play", "Back hooks included"] }
 ];
 
-const CATEGORIES = ["All", "Rectangle (MIMI)", "Capsule", "Arch", "Irregular", "Grid", "Round", "Ultrafragola"];
+const CATEGORIES = ["All", "Rectangle (MIMI)", "Capsule", "Arch", "Irregular", "Grid", "Round", "Ultrafragola", "LED"];
+
+const hasLED = p => /\bLED\b|backlight/i.test(p.name) || p.notes.some(n => /lights/i.test(n) && !/^add/i.test(n));
+const inView = p => active === "All" || (active === "LED" ? hasLED(p) : p.cat === active);
 
 const php = n => "Php " + n.toLocaleString("en-US");
 
@@ -245,9 +248,27 @@ function drawChips() {
   });
 }
 
+const ledBox = document.createElement("div");
+ledBox.className = "led-demo led-filter";
+ledBox.hidden = true;
+grid.before(ledBox);
+
+function drawLedVideos() {
+  if (active !== "LED") { ledBox.hidden = true; ledBox.innerHTML = ""; return; }
+  ledBox.innerHTML = "";
+  document.querySelectorAll(".block.sand .led-demo figure").forEach(f => ledBox.appendChild(f.cloneNode(true)));
+  ledBox.hidden = false;
+  ledBox.querySelectorAll("video").forEach(v => {
+    v.muted = true;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { v.pause(); v.controls = true; }
+    else v.play().catch(() => {});
+  });
+}
+
 function drawGrid() {
   grid.innerHTML = "";
-  PRODUCTS.filter(p => active === "All" || p.cat === active).forEach((p, i) => {
+  drawLedVideos();
+  PRODUCTS.filter(inView).forEach((p, i) => {
     const card = document.createElement("button");
     card.className = "card";
     card.style.setProperty("--i", Math.min(i, 12));
@@ -572,7 +593,7 @@ if ("IntersectionObserver" in window) {
   setTimeout(() => revealEls.forEach(el => el.classList.add("show")), 3000);
 }
 
-const ledVideos = document.querySelectorAll(".led-demo video");
+const ledVideos = document.querySelectorAll(".block.sand .led-demo video");
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   ledVideos.forEach(v => { v.removeAttribute("autoplay"); v.pause(); v.controls = true; });
 } else if ("IntersectionObserver" in window) {
