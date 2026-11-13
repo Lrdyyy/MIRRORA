@@ -276,7 +276,12 @@ function openModal(p) {
   mBody.innerHTML = `${img}${thumbs}
     <div class="m-info">
       <p class="tag">${p.cat}</p><h2 id="mTitle">${p.name}</h2><p class="use">${p.use}</p>
-      ${table}${notes}
+      ${table}
+      ${p.sizes.length ? `<button class="cmp-toggle" id="cmpBtn" type="button" aria-expanded="false" aria-controls="cmpBox">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V3m0 0 3 3M4 3 1 6M10 21h11M14 7h7v14"/></svg>
+        Compare with my height</button>
+      <div class="cmp" id="cmpBox" hidden></div>` : ""}
+      ${notes}
       <div class="actions">
         <button class="btn" type="button" id="orderBtn">Order now</button>
         <a class="btn outline" href="${CONTACT.messenger}" target="_blank" rel="noopener">Inquire on Messenger</a>
@@ -291,7 +296,184 @@ function openModal(p) {
 
   document.getElementById("orderBtn").addEventListener("click", () => openOrder(p));
 
+  const cmpBtn = document.getElementById("cmpBtn");
+  if (cmpBtn) cmpBtn.addEventListener("click", () => {
+    const box = document.getElementById("cmpBox");
+    const open = box.hidden;
+    box.hidden = !open;
+    cmpBtn.setAttribute("aria-expanded", open);
+    if (open) buildCompare(p, box);
+  });
+
   modal.showModal();
+}
+
+const IN = 2.54;
+
+function parseSize(text) {
+  const t = text.toLowerCase();
+  const toCm = t.includes("in") && !t.includes("cm") ? IN : 1;
+  const nums = (t.match(/\d+(\.\d+)?/g) || []).map(Number);
+  if (!nums.length) return null;
+  if (t.includes("diameter")) return { w: nums[0] * toCm, h: nums[0] * toCm, round: true };
+  return { w: nums[0] * toCm, h: (nums[1] || nums[0]) * toCm };
+}
+
+const cmpState = { unit: "cm", height: 165, bottom: null, sizeUnit: null };
+try { const s = JSON.parse(localStorage.getItem("mirroraHeight")); if (s) Object.assign(cmpState, s, { bottom: null }); } catch (e) {}
+function saveCmp() { try { localStorage.setItem("mirroraHeight", JSON.stringify({ unit: cmpState.unit, height: cmpState.height })); } catch (e) {} }
+
+const fmt = cm => cmpState.unit === "cm"
+  ? Math.round(cm) + " cm"
+  : (() => { const i = Math.round(cm / IN); return Math.floor(i / 12) + "′ " + (i % 12) + "″"; })();
+
+function sizeText(s, unit) {
+  const one = cm => {
+    if (unit === "cm") return String(Math.round(cm));
+    const inches = cm / IN;
+    if (unit === "in") return String(Math.round(inches * 10) / 10);
+    const r = Math.round(inches);
+    return Math.floor(r / 12) + "′ " + (r % 12) + "″";
+  };
+  const end = unit === "ft" ? "" : " " + unit;
+  if (s.round) return one(s.w) + end + " diameter";
+  return one(s.w) + " × " + one(s.h) + end;
+}
+
+function buildCompare(p, box) {
+  const sizes = p.sizes.map(s => ({ label: s[0], text: s[1], ...parseSize(s[1]) })).filter(s => s.w);
+  let pick = 0;
+  const isRound = p.cat === "Round";
+
+  box.innerHTML = `
+    <div class="cmp-grid">
+      <div>
+        <div class="field">
+          <span class="lbl">Units</span>
+          <div class="seg" role="group" aria-label="Units">
+            <button data-u="cm">CM</button><button data-u="ft">FT / IN</button>
+          </div>
+        </div>
+        <div class="field" id="hField"></div>
+        <div class="field">
+          <span class="lbl">Mirror size</span>
+          <div class="seg seg-size" role="group" aria-label="Mirror size units">
+            <button data-su="cm">CM</button><button data-su="ft">FT</button><button data-su="in">IN</button>
+          </div>
+          <div class="sizepick"></div>
+        </div>
+        <div class="field">
+          <label for="bIn">Bottom edge from floor</label>
+          <div class="row" id="bRow"></div>
+          <p class="hint">Whole body mirrors usually sit near the floor; vanity mirrors hang higher.</p>
+        </div>
+      </div>
+      <div>
+        <svg class="cmp-svg" id="cmpSvg" role="img" aria-label="Your height next to the mirror, to scale"></svg>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+      </div>
+    </div>`;
+
+  const svg = box.querySelector("#cmpSvg");
+
+  function drawInputs() {
+    box.querySelectorAll(".seg button[data-u]").forEach(b => b.setAttribute("aria-pressed", b.dataset.u === cmpState.unit));
+    const hf = box.querySelector("#hField"), br = box.querySelector("#bRow");
+    const s = sizes[pick];
+    if (cmpState.bottom === null) cmpState.bottom = s.h >= 140 ? 5 : 100;
+    if (cmpState.unit === "cm") {
+      hf.innerHTML = `<label for="hIn">Your height</label>
+        <div class="row"><input id="hIn" type="number" inputmode="decimal" min="80" max="230" value="${Math.round(cmpState.height)}"> cm</div>`;
+      br.innerHTML = `<input id="bIn" type="number" min="0" max="250" value="${Math.round(cmpState.bottom)}"> cm`;
+    } else {
+      const i = Math.round(cmpState.height / IN);
+      hf.innerHTML = `<label for="hFt">Your height</label>
+        <div class="row"><input id="hFt" type="number" min="2" max="7" value="${Math.floor(i / 12)}" aria-label="Feet"> ft
+        <input id="hInch" type="number" min="0" max="11" value="${i % 12}" aria-label="Inches"> in</div>`;
+      br.innerHTML = `<input id="bIn" type="number" min="0" max="100" value="${Math.round(cmpState.bottom / IN)}"> in`;
+    }
+    hf.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
+      const v = cmpState.unit === "cm"
+        ? +box.querySelector("#hIn").value
+        : (+box.querySelector("#hFt").value * 12 + +box.querySelector("#hInch").value) * IN;
+      if (v >= 80 && v <= 240) { cmpState.height = v; saveCmp(); draw(); }
+    }));
+    br.querySelector("input").addEventListener("input", e => {
+      const v = +e.target.value * (cmpState.unit === "cm" ? 1 : IN);
+      if (v >= 0 && v <= 260) { cmpState.bottom = v; draw(); }
+    });
+  }
+
+  function draw() {
+    box.querySelectorAll(".sizepick button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.i === pick));
+    const s = sizes[pick], H = cmpState.height, B = cmpState.bottom;
+    const top = Math.max(H, B + s.h) + 20;
+    const W = 420, VH = 340, floor = VH - 24;
+    const k = (floor - 14) / top;
+    const h = H * k;
+    const px = 60, mx = px + h * .3 + 50;
+    const y = cm => floor - cm * k;
+
+    const step = cmpState.unit === "cm" ? 50 : 12 * IN;
+    let ticks = "";
+    for (let c = 0; c <= top; c += step)
+      ticks += `<line x1="34" x2="40" y1="${y(c)}" y2="${y(c)}" stroke="#A6A6A6"/>
+        <text x="30" y="${y(c) + 4}" text-anchor="end" font-size="10" fill="#6B5F51">${cmpState.unit === "cm" ? c : Math.round(c / IN / 12) + "′"}</text>`;
+
+    const cx = px + h * .15, headR = h * .062, top0 = y(H);
+    const bodyTop = top0 + headR * 2 + h * .015, hip = y(H * .48);
+    const person = `<g fill="#CAC8C5">
+      <circle cx="${cx}" cy="${top0 + headR}" r="${headR}"/>
+      <rect x="${cx - h * .09}" y="${bodyTop}" width="${h * .18}" height="${hip - bodyTop}" rx="${h * .04}"/>
+      <rect x="${cx - h * .075}" y="${hip - 4}" width="${h * .065}" height="${floor - hip + 4}" rx="${h * .02}"/>
+      <rect x="${cx + h * .01}" y="${hip - 4}" width="${h * .065}" height="${floor - hip + 4}" rx="${h * .02}"/></g>
+      <line x1="${cx - h * .12}" x2="${mx + s.w * k + 10}" y1="${y(H * .93)}" y2="${y(H * .93)}" stroke="#A68B69" stroke-dasharray="4 4"/>
+      <text x="${mx + s.w * k + 14}" y="${y(H * .93) + 4}" font-size="10" fill="#7A6140">eye level</text>`;
+
+    const mw = s.w * k, mh = s.h * k, mxL = mx, myT = y(B + s.h);
+    let shape;
+    if (s.round || isRound) shape = `<ellipse cx="${mxL + mw / 2}" cy="${myT + mh / 2}" rx="${mw / 2}" ry="${mh / 2}"/>`;
+    else if (p.cat === "Capsule") shape = `<rect x="${mxL}" y="${myT}" width="${mw}" height="${mh}" rx="${Math.min(mw, mh) / 2}"/>`;
+    else if (p.cat === "Arch") { const r = Math.min(mw / 2, mh);
+      shape = `<path d="M${mxL} ${myT + mh} V${myT + r} A${mw / 2} ${r} 0 0 1 ${mxL + mw} ${myT + r} V${myT + mh} Z"/>`; }
+    else if (p.cat === "Irregular") shape = `<path d="M${mxL + mw * .2} ${myT} C${mxL + mw * .9} ${myT - mh * .02} ${mxL + mw * 1.02} ${myT + mh * .35} ${mxL + mw * .92} ${myT + mh * .6}
+        S${mxL + mw * .7} ${myT + mh} ${mxL + mw * .35} ${myT + mh} S${mxL - mw * .02} ${myT + mh * .7} ${mxL + mw * .05} ${myT + mh * .4} S${mxL} ${myT + mh * .02} ${mxL + mw * .2} ${myT} Z"/>`;
+    else shape = `<rect x="${mxL}" y="${myT}" width="${mw}" height="${mh}" rx="2"/>`;
+
+    svg.setAttribute("viewBox", `0 0 ${Math.max(W, mx + mw + 70)} ${VH}`);
+    svg.innerHTML = `${ticks}
+      <line x1="40" x2="${Math.max(W, mx + mw + 70)}" y1="${floor}" y2="${floor}" stroke="#2B241C" stroke-width="1.5"/>
+      ${person}
+      <g fill="#E8E2D6" stroke="#A68B69" stroke-width="4">${shape}</g>
+      <text x="${cx}" y="${floor + 16}" text-anchor="middle" font-size="11" fill="#2B241C">You · ${fmt(H)}</text>
+      <text x="${mxL + mw / 2}" y="${floor + 16}" text-anchor="middle" font-size="11" fill="#2B241C">${fmt(s.w)} × ${fmt(s.h)}</text>`;
+
+    const pct = Math.round(s.h / H * 100);
+    const eye = H * .93, topEdge = B + s.h;
+    const lowSeen = 2 * B - eye, highSeen = 2 * topEdge - eye;
+    let msg = `This mirror is <b>${fmt(s.h)}</b> tall, about <b>${pct}%</b> of your height. `;
+    if (topEdge < eye) msg += "Its top edge sits below your eyes, so you would have to bend to see yourself. Try hanging it higher.";
+    else if (lowSeen <= 0 && highSeen >= H) msg += "At this placement you can see your <b>whole body</b>, head to toe.";
+    else msg += `Standing in front of it you'll see from ${highSeen >= H ? "<b>the top of your head</b>" : "about <b>" + fmt(highSeen) + "</b>"}
+      down to ${lowSeen <= 0 ? "<b>your feet</b>" : "about <b>" + fmt(lowSeen) + "</b> from the floor"}.`;
+    if (s.h < H / 2) msg += ` <span class="hint">For a full-body view you need at least ${fmt(H / 2)}.</span>`;
+    box.querySelector("#verdict").innerHTML = msg;
+  }
+
+  box.querySelectorAll(".seg button[data-u]").forEach(b => b.addEventListener("click", () => { cmpState.unit = b.dataset.u; saveCmp(); drawInputs(); draw(); }));
+  const listedIn = /\bin\b/.test(p.sizes[0][1]) && !/cm/.test(p.sizes[0][1]) ? "in" : "cm";
+  function drawSizes() {
+    const u = cmpState.sizeUnit || listedIn;
+    box.querySelectorAll(".seg button[data-su]").forEach(b => b.setAttribute("aria-pressed", b.dataset.su === u));
+    const pickBox = box.querySelector(".sizepick");
+    pickBox.innerHTML = sizes.map((s, i) => `<button data-i="${i}">${sizeText(s, u)}</button>`).join("");
+    pickBox.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      pick = +b.dataset.i; cmpState.bottom = null; drawInputs(); draw(); }));
+  }
+  box.querySelectorAll(".seg button[data-su]").forEach(b => b.addEventListener("click", () => {
+    cmpState.sizeUnit = b.dataset.su; drawSizes(); draw(); }));
+  drawSizes();
+  drawInputs(); draw();
 }
 
 const orderModal = document.getElementById("orderModal");
@@ -388,6 +570,16 @@ if ("IntersectionObserver" in window) {
   }), { threshold: 0, rootMargin: "0px 0px -6% 0px" });
   revealEls.forEach(el => { el.classList.add("reveal"); io.observe(el); });
   setTimeout(() => revealEls.forEach(el => el.classList.add("show")), 3000);
+}
+
+const ledVideos = document.querySelectorAll(".led-demo video");
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  ledVideos.forEach(v => { v.removeAttribute("autoplay"); v.pause(); v.controls = true; });
+} else if ("IntersectionObserver" in window) {
+  const vio = new IntersectionObserver(entries => entries.forEach(en => {
+    if (en.isIntersecting) en.target.play().catch(() => {}); else en.target.pause();
+  }), { threshold: .25 });
+  ledVideos.forEach(v => vio.observe(v));
 }
 
 drawChips();
