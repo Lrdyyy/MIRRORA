@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mirrora Philippines | Mirrors made to fit your space</title>
+  <meta name="description" content="Thoughtfully crafted, bespoke mirrors in round, arch, capsule and grid designs, with wood, rattan, aluminum and metal frames and built-in LED options.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700&family=Montserrat:wght@400;500;600&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="top">
+    <div class="wrap bar">
+      <a href="#top" aria-label="Mirrora Philippines, home"><img class="logo" src="images/logo.png" alt="Mirrora Philippines"></a>
+      <nav>
+        <a class="navlink" href="#collections">Collections</a>
+        <span class="pop"><a class="btn" data-contact href="#contact" aria-haspopup="true" aria-expanded="false">Contact us now</a></span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+        <section class="wrap hero">
+      <div>
+        <h1>Mirrors made to fit your space.</h1>
+        <p class="lede">Discover thoughtfully crafted, bespoke mirrors designed to complement your interiors. From timeless round and elegant arch silhouettes to modern capsule and grid designs.</p>
+        <div class="actions">
+          <a class="btn" href="#collections">View collections</a>
+          <span class="pop"><a class="btn outline" data-contact href="#contact" aria-haspopup="true" aria-expanded="false">Contact us now</a></span>
+        </div>
+      </div>
+      <img class="arch" src="images/tita.jpg" alt="Backlit mirror above a bathroom vanity">
+    </section>
+
+        <section id="collections" class="block">
+      <div class="wrap">
+        <h2>The collections</h2>
+        <p class="lede">Explore a variety of shapes, sizes, and finishes in wood, rattan, aluminum, and metal frames with a touch of luxury with our built-in LED mirrors.</p>
+        <div class="chips" id="chips" role="group" aria-label="Filter by shape"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <section class="block sand">
+      <div class="wrap points">
+        <div><h3>Custom colors</h3><p>Colors and finishes can be customized on many designs.</p></div>
+        <div><h3>LED options</h3><p>Tri-color lights, single touch switch, ready to plug and play.</p></div>
+        <div><h3>Ready to hang</h3><p>Back hooks included upon request.</p></div>
+      </div>
+      <div class="wrap led-demo">
+        <figure>
+          <video src="images/led-colors.mp4" poster="images/led-colors.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Finger tapping the touch switch as the light changes between warm, natural and cool white"></video>
+          <figcaption>Tap the touch switch to change the light from warm to natural to cool white.</figcaption>
+        </figure>
+        <figure>
+          <video src="images/led-touch.mp4" poster="images/led-touch.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Hands touching the mirror as the lights turn on"></video>
+          <figcaption>One touch turns the lights on and off.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+        <section id="contact" class="block">
+      <div class="wrap contact">
+        <h2>Contact us now</h2>
+        <p class="lede">Tell us the mirror, size and color you want, and we will reply with the details.</p>
+        <div class="actions center">
+          <a class="btn" id="msgBtn" href="#">Message us on Messenger</a>
+          <a class="btn outline" id="mailBtn" href="#">Email us</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <img src="images/logo-light.jpg" alt="Mirrora Philippines" class="footlogo">
+      <small>© 2026 Mirrora Philippines</small>
+    </div>
+  </footer>
+
+  <dialog id="orderModal" class="small order" aria-labelledby="oTitle">
+    <button class="close" id="oClose" aria-label="Close">×</button>
+    <form id="orderForm" class="choose" novalidate>
+      <h2 id="oTitle">Order now</h2>
+      <p class="osub" id="oFor"></p>
+      <label>Name<input id="oName" name="name" autocomplete="name" required></label>
+      <label>Address<textarea id="oAddress" name="address" rows="2" autocomplete="street-address" required></textarea></label>
+      <label>Contact number<input id="oPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required></label>
+      <label>Orders<textarea id="oOrders" name="orders" rows="4" required></textarea></label>
+      <p class="oerr" id="oErr" role="alert"></p>
+      <button class="btn" type="submit">Send order by email</button>
+      <button class="btn outline" type="button" id="oMsg">Send order on Messenger</button>
+      <p class="onote" id="oNote" role="status"></p>
+    </form>
+  </dialog>
+
+  <dialog id="modal" aria-labelledby="mTitle">
+    <button class="close" id="mClose" aria-label="Close">×</button>
+    <div id="mBody"></div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
