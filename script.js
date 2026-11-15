@@ -606,24 +606,12 @@ if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 const slideBox = document.querySelector(".slides");
 if (slideBox) {
   const slides = [...slideBox.querySelectorAll("img")];
-  const dotBox = slideBox.querySelector(".dots");
   let cur = 0, timer = null;
-  const dots = slides.map((img, i) => {
-    const d = document.createElement("button");
-    d.type = "button";
-    d.setAttribute("role", "tab");
-    d.setAttribute("aria-label", "Show picture " + (i + 1));
-    d.addEventListener("click", () => { show(i); start(); });
-    dotBox.appendChild(d);
-    return d;
-  });
   const show = i => {
-    cur = (i + slides.length) % slides.length;
+    cur = i % slides.length;
     slides.forEach((s, k) => s.classList.toggle("on", k === cur));
-    dots.forEach((d, k) => d.setAttribute("aria-selected", k === cur));
   };
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const start = () => { clearInterval(timer); if (!reduce) timer = setInterval(() => show(cur + 1), 4000); };
+  const start = () => { clearInterval(timer); timer = setInterval(() => show(cur + 1), 2000); };
   document.addEventListener("visibilitychange", () => document.hidden ? clearInterval(timer) : start());
   show(0);
   start();
