@@ -50,6 +50,13 @@ h3 { font-size: 1.2rem; font-weight: 600; }
 .actions.center { justify-content: center; }
 .arch { width: min(380px, 100%); aspect-ratio: 4 / 5; object-fit: cover; margin-left: auto;
   border-radius: 999px 999px 8px 8px; border: 10px solid var(--tan); }
+.slides { position: relative; overflow: hidden; display: block; background: var(--tan); }
+.slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.4s ease; }
+.slides img.on { opacity: 1; }
+.slides .dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 8px; z-index: 1; }
+.slides .dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(255, 255, 255, .55); box-shadow: 0 1px 3px rgba(0, 0, 0, .35); transition: background .3s, transform .3s; }
+.slides .dots button[aria-selected="true"] { background: #fff; transform: scale(1.3); }
 
 .block { padding: 72px 0; border-top: 1px solid var(--line); }
 .block.sand { background: var(--sand); }
