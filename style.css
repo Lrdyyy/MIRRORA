@@ -146,11 +146,14 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
   .hero, .points, .led-demo { grid-template-columns: 1fr; }
   .hero { padding-top: 24px; }
   .hero-card { display: block; aspect-ratio: auto; }
-  .slides { position: relative; inset: auto; height: min(420px, 95vw); }
+  .slides { position: relative; inset: auto; }
   .slides img { object-position: 90% 30%; }
   .slides img.fit-right { object-position: 100% 30%; }
-  .slides::after { background: linear-gradient(180deg, rgba(249, 249, 249, 0) 55%, rgba(249, 249, 249, 1) 100%); }
-  .hero-text { max-width: none; padding: 0 22px 28px; margin-top: -36px; }
+  .slides { height: min(460px, 108vw); }
+  .slides::after { background: linear-gradient(180deg, rgba(249, 249, 249, 0) 30%, rgba(249, 249, 249, .1) 42%, rgba(249, 249, 249, .26) 52%,
+    rgba(249, 249, 249, .46) 61%, rgba(249, 249, 249, .66) 70%, rgba(249, 249, 249, .83) 78%, rgba(249, 249, 249, .95) 85%, rgba(249, 249, 249, 1) 90%); }
+  .hero-text { max-width: none; padding: 0 22px 28px; margin-top: -8px; }
+  .hero-text .lede { margin-top: 10px; }
   .navlink { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
