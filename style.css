@@ -145,7 +145,8 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
   .hero, .points, .led-demo { grid-template-columns: 1fr; }
   .hero { padding-top: 24px; }
   .slides img { object-position: 50% var(--pym, 12%); }
-  .slides { aspect-ratio: auto; max-height: none; height: min(400px, 88vw); }
+  .slides { aspect-ratio: 4 / 3; max-height: none; }
+
   .slides::after { background: linear-gradient(180deg, rgba(249, 249, 249, 0) 52%, rgba(249, 249, 249, .1) 62%, rgba(249, 249, 249, .28) 71%,
     rgba(249, 249, 249, .5) 79%, rgba(249, 249, 249, .72) 86%, rgba(249, 249, 249, .9) 92%, rgba(249, 249, 249, 1) 98%); }
   .hero-text { max-width: none; padding: 0 22px 28px; margin-top: -8px; }
