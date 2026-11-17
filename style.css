@@ -45,7 +45,7 @@ h3 { font-size: 1.2rem; font-weight: 600; }
 .hero { padding-top: 40px; padding-bottom: 72px; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .actions.center { justify-content: center; }
-.hero-card { position: relative; overflow: hidden; border: 10px solid var(--tan); border-radius: 8px; background: var(--paper); }
+.hero-card { position: relative; border: 10px solid var(--tan); border-radius: 8px; background: var(--paper); }
 .slides { position: relative; aspect-ratio: 16 / 9; max-height: 66vh; width: 100%; overflow: hidden; background: var(--sand); }
 .slides::after { content: ""; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(180deg, rgba(249, 249, 249, 0) 74%, rgba(249, 249, 249, .14) 80%, rgba(249, 249, 249, .36) 86%,
