@@ -45,15 +45,19 @@ h3 { font-size: 1.2rem; font-weight: 600; }
 .eyebrow { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .22em; font-size: .75rem; color: var(--tan-dark); margin: 0 0 18px; font-weight: 600; }
 .lede { color: var(--muted); max-width: 54ch; margin: 18px 0 28px; }
 
-.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; padding-top: 56px; padding-bottom: 72px; }
+.hero { padding-top: 40px; padding-bottom: 72px; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .actions.center { justify-content: center; }
-.arch { width: min(380px, 100%); aspect-ratio: 4 / 5; object-fit: cover; margin-left: auto;
-  border-radius: 999px 999px 8px 8px; border: 10px solid var(--tan); }
-.slides { position: relative; overflow: hidden; display: block; background: var(--tan); }
-.slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1);
+.hero-card { position: relative; display: flex; align-items: center; aspect-ratio: 16 / 10; overflow: hidden;
+  border: 10px solid var(--tan); border-radius: 8px; background: var(--paper); }
+.slides { position: absolute; inset: 0; overflow: hidden; background: var(--sand); }
+.slides::after { content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(90deg, rgba(249, 249, 249, .95) 0%, rgba(249, 249, 249, .9) 30%, rgba(249, 249, 249, .62) 42%, rgba(249, 249, 249, .25) 52%, rgba(249, 249, 249, 0) 60%); }
+.hero-text { position: relative; z-index: 2; max-width: 46%; padding: 48px 0 48px 56px; }
+.slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: left center; opacity: 0; transform: scale(1);
   transition: opacity .8s ease, transform 2.8s linear; }
 .slides img.on { opacity: 1; transform: scale(1.07); }
+.slides img.fit-right { object-position: right center; }
 @media (prefers-reduced-motion: reduce) { .slides img, .slides img.on { transform: none; } }
 
 .block { padding: 72px 0; border-top: 1px solid var(--line); }
@@ -140,8 +144,13 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
 
 @media (max-width: 760px) {
   .hero, .points, .led-demo { grid-template-columns: 1fr; }
-  .arch { margin: 0 auto; order: -1; width: min(260px, 70vw); }
-  .hero { padding-top: 32px; gap: 32px; }
+  .hero { padding-top: 24px; }
+  .hero-card { display: block; aspect-ratio: auto; }
+  .slides { position: relative; inset: auto; height: min(420px, 95vw); }
+  .slides img { object-position: 90% 30%; }
+  .slides img.fit-right { object-position: 100% 30%; }
+  .slides::after { background: linear-gradient(180deg, rgba(249, 249, 249, 0) 55%, rgba(249, 249, 249, 1) 100%); }
+  .hero-text { max-width: none; padding: 0 22px 28px; margin-top: -36px; }
   .navlink { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -158,8 +167,7 @@ footer { background: var(--tan); color: var(--ink); padding: 28px 0; }
   animation: bob 2.4s ease-in-out .4s infinite; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-.hero > div, .hero .arch { animation: fadeUp .8s ease both; }
-.hero .arch { animation-delay: .15s; }
+.hero-text { animation: fadeUp .8s ease both; animation-delay: .15s; }
 
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.show { opacity: 1; transform: none; }
