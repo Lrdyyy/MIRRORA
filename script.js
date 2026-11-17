@@ -579,6 +579,7 @@ document.querySelectorAll("[data-contact]").forEach(btn => btn.addEventListener(
     <a class="btn outline" href="mailto:${CONTACT.email}">Email us</a>`;
   btn.parentElement.appendChild(bubble);
   btn.setAttribute("aria-expanded", "true");
+  requestAnimationFrame(() => bubble.scrollIntoView({ block: "nearest", behavior: "smooth" }));
 }));
 
 document.addEventListener("click", e => { if (!e.target.closest(".pop")) closeBubbles(); });
